@@ -2,6 +2,6 @@ version: "3.8"
 services:
   web:
     build: .
-    image: Abivarmang/cicd-demo:latest
+    image: abivarmang/cicd-demo:latest
     ports:
       - "3000:3000"
