@@ -32,4 +32,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push to Docker Hub
-        run: docker push your-dockerhub-username/cicd-demo:latest
+        run: docker push abivarmang/cicd-demo:latest
