@@ -6,14 +6,23 @@ spec:
   hosts:
   - "*"
   gateways:
-  - myapp-gateway
+  - canary-gateway
   http:
+  - match:
+    - headers:
+        -user-agent:
+           regex: .*bot.*
   - route:
     - destination:
-        host: myapp
+        host: canary-app
+        subset: v1
+      weight: 100
+  - route:
+    - destination:
+        host: canary-app
         subset: v1
       weight: 80
     - destination:
-        host: myapp
+        host: canary-app
         subset: v2
       weight: 20
