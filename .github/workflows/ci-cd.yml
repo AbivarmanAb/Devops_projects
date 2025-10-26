@@ -1,0 +1,43 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Install dependencies in the correct folder
+      - name: Install dependencies
+        run: npm install
+        working-directory: "CI CD Pipeline with GitHub Actions & Docker (No Cloud Needed)"
+
+      # Run tests in the correct folder
+      - name: Run tests
+        run: npm test
+        working-directory: "CI CD Pipeline with GitHub Actions & Docker (No Cloud Needed)"
+
+      # Build Docker image
+      - name: Build Docker image
+        run: docker build -t abivarmang/cicd-demo:latest "CI CD Pipeline with GitHub Actions & Docker (No Cloud Needed)"
+
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # Push Docker image
+      - name: Push Docker image
+        run: docker push abivarmang/cicd-demo:latest
