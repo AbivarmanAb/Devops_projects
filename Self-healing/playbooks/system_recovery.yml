@@ -1,0 +1,17 @@
+---
+- name: Handle system alerts
+  hosts: localhost
+  connection: local
+  
+  tasks:
+    - name: Log CPU alert
+      debug:
+        msg: "High CPU usage detected - monitoring system"
+        
+    - name: Get top processes
+      shell: ps aux --sort=-%cpu | head -10
+      register: top_processes
+      
+    - name: Display top CPU processes
+      debug:
+        var: top_processes.stdout
