@@ -1,0 +1,44 @@
+---
+- name: Auto-heal NGINX service
+  hosts: localhost
+  connection: local
+  vars:
+    alert_name: "{{ alert_name }}"
+    
+  tasks:
+    - name: Debug alert info
+      debug:
+        msg: "Processing alert: {{ alert_name }}"
+        
+    - name: Check NGINX container status
+      shell: docker ps --filter "name=nginx" --format "{{ '{{' }}.Status{{ '}}' }}"
+      register: nginx_status
+      changed_when: false
+      
+    - name: Display current status
+      debug:
+        var: nginx_status.stdout
+        
+    - name: Restart NGINX service
+      shell: |
+        docker restart selfhealing-nginx-1
+      when: "'Exited' in nginx_status.stdout or nginx_status.rc != 0"
+      register: restart_result
+      
+    - name: Log restart action
+      debug:
+        msg: "NGINX restarted successfully"
+      when: restart_result is changed
+      
+    - name: Verify service recovery
+      shell: |
+        sleep 5
+        curl -f http://localhost:8080/ || echo "FAILED"
+      register: verify_result
+      retries: 3
+      delay: 5
+      until: verify_result.rc == 0
+      
+    - name: Send recovery notification
+      debug:
+        msg: "NGINX service recovered successfully after alert: {{ alert_name }}"
